@@ -8,39 +8,42 @@ import java.util.List;
 
 public class EmployeeDAO {
 
-	public Employee getEmployeeById(int empId) throws SQLException {
-		Connection con = WileyConnection.getConnection();
-		PreparedStatement pst;
-		ResultSet rs;
+	public Employee getEmployeeById(int empId) {
+		Connection con = null;
 		Employee employee = null;
 		
 		try {
-			pst = con.prepareStatement("SELECT * FROM employee WHERE id = ?");
+			con = WileyConnection.getConnection();
+			PreparedStatement pst = con.prepareStatement("SELECT * FROM employee WHERE id = ?");
 			pst.setInt(1, empId);
-			rs = pst.executeQuery();
+			ResultSet rs = pst.executeQuery();
 			
 			if (rs.next())
 				employee = new Employee(rs.getInt(1), rs.getString(2), rs.getInt(3));
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				con.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}			
 		}
 	
-		con.close();
 		return employee;
 	}
 
-	public List<Employee> getEmployeesFilteredByAge(int[] ageRange) throws SQLException {
-		Connection con = WileyConnection.getConnection();
-		PreparedStatement pst;
-		ResultSet rs;
+	public List<Employee> getEmployeesFilteredByAge(int[] ageRange) {
+		Connection con = null;
 		Employee employee = null;
 		List<Employee> filteredEmployees = new ArrayList<>();
 		
 		try {
-			pst = con.prepareStatement("SELECT * FROM employee WHERE age BETWEEN ? AND ?");
+			con = WileyConnection.getConnection();
+			PreparedStatement pst = con.prepareStatement("SELECT * FROM employee WHERE age BETWEEN ? AND ?");
 			pst.setInt(1, ageRange[0]);
 			pst.setInt(2, ageRange[1]);
-			rs = pst.executeQuery();
+			ResultSet rs = pst.executeQuery();
 			
 			while (rs.next()) {
 				employee = new Employee(rs.getInt(1), rs.getString(2), rs.getInt(3));
@@ -48,9 +51,13 @@ public class EmployeeDAO {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				con.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}			
 		}
-	
-		con.close();
 		return filteredEmployees;
 	}
 
